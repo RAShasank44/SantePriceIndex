@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "621274918073",
+    "project_id": "santepriceindex-30363",
+    "storage_bucket": "santepriceindex-30363.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621274918073:android:eeee481ed802970d8eff68",
+        "android_client_info": {
+          "package_name": "com.example.santepriceindex"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBY135wJsLd8mYeB80O1MtsFTdeKRZyuhw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
