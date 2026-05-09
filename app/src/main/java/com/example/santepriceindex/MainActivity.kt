@@ -22,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-// Professional Color Palette
+// --- THEME COLORS ---
 val DeepSpace = Color(0xFF0F0F0F)
 val CardGray = Color(0xFF1E1E1E)
 val NeonAmber = Color(0xFFFFC107)
 val SoftGreen = Color(0xFF4CAF50)
+val PriceRed = Color(0xFFFF5252)
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class)
@@ -36,11 +37,12 @@ class MainActivity : ComponentActivity() {
             val myViewModel: SanteViewModel = viewModel()
             val vegetableList by myViewModel.items.collectAsState()
 
+            // State Management
             var transportInput by remember { mutableStateOf("5") }
             var wasteInput by remember { mutableStateOf("10") }
             var isSlateMode by remember { mutableStateOf(false) }
 
-            // --- ANIMATED TRANSITION BETWEEN VIEWS ---
+            // Smooth Transition between Vendor and Customer view
             AnimatedContent(
                 targetState = isSlateMode,
                 transitionSpec = {
@@ -52,66 +54,38 @@ class MainActivity : ComponentActivity() {
                 }
             ) { targetSlateMode ->
                 if (targetSlateMode) {
-                    // --- CUSTOMER VIEW: The "Digital Slate" ---
+                    // --- PHASE 3: CUSTOMER VIEW (DIGITAL SLATE) ---
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Black)
                             .clickable { isSlateMode = false }
                     ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(32.dp)
-                        ) {
+                        LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(32.dp)) {
                             items(vegetableList) { vegetable ->
                                 val transport = transportInput.toDoubleOrNull() ?: 0.0
                                 val waste = (wasteInput.toDoubleOrNull() ?: 0.0) / 100.0
                                 val finalPrice = PricingEngine.calculateRRP(vegetable.mandiPrice, transport, waste, 5.0)
 
                                 Column(modifier = Modifier.padding(bottom = 48.dp)) {
-                                    Text(
-                                        text = vegetable.name.uppercase(),
-                                        color = Color.DarkGray,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        letterSpacing = 2.sp
-                                    )
-                                    Text(
-                                        text = "₹${"%.0f".format(finalPrice)}",
-                                        color = NeonAmber,
-                                        fontSize = 110.sp,
-                                        fontWeight = FontWeight.Black
-                                    )
+                                    Text(vegetable.name.uppercase(), color = Color.DarkGray, fontSize = 20.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                                    Text("₹${"%.0f".format(finalPrice)}", color = NeonAmber, fontSize = 110.sp, fontWeight = FontWeight.Black)
                                     Divider(color = Color(0xFF333333), thickness = 1.dp)
                                 }
                             }
                         }
                     }
                 } else {
-                    // --- VENDOR VIEW: Modern Dashboard ---
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(DeepSpace)
-                            .padding(20.dp)
-                    ) {
-                        Text(
-                            "SANTE INDEX",
-                            color = Color.White,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 1.sp
-                        )
+                    // --- PHASE 2 & 4: VENDOR VIEW (DASHBOARD) ---
+                    Column(modifier = Modifier.fillMaxSize().background(DeepSpace).padding(20.dp)) {
+                        Text("SANTE INDEX", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 1.sp)
                         Text("Inventory & Margin Manager", color = Color.Gray, fontSize = 14.sp)
 
                         Spacer(modifier = Modifier.height(24.dp))
 
                         Button(
                             onClick = { isSlateMode = true },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .clip(RoundedCornerShape(12.dp)),
+                            modifier = Modifier.fillMaxWidth().height(56.dp).clip(RoundedCornerShape(12.dp)),
                             colors = ButtonDefaults.buttonColors(containerColor = NeonAmber)
                         ) {
                             Text("LAUNCH DIGITAL SLATE", color = Color.Black, fontWeight = FontWeight.Bold)
@@ -119,13 +93,8 @@ class MainActivity : ComponentActivity() {
 
                         Spacer(modifier = Modifier.height(24.dp))
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(CardGray)
-                                .padding(16.dp)
-                        ) {
+                        // Input Card
+                        Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(CardGray).padding(16.dp)) {
                             Text("Cost Variables", color = Color.White, fontWeight = FontWeight.Bold)
                             Spacer(modifier = Modifier.height(12.dp))
                             CustomTextField(value = transportInput, label = "Transport (₹/kg)") { transportInput = it }
@@ -134,8 +103,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         Spacer(modifier = Modifier.height(24.dp))
-
-                        Text("LIVE PRICE FEED", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("LIVE PRICE FEED & TRENDS", color = Color.Gray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(12.dp))
 
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -144,33 +112,36 @@ class MainActivity : ComponentActivity() {
                                 val waste = (wasteInput.toDoubleOrNull() ?: 0.0) / 100.0
                                 val suggested = PricingEngine.calculateRRP(vegetable.mandiPrice, transport, waste, 5.0)
 
-                                // PULSE ANIMATION FOR LIVE PRICES
+                                // Pulsing Alpha for Live Effect
                                 val infiniteTransition = rememberInfiniteTransition()
                                 val alpha by infiniteTransition.animateFloat(
-                                    initialValue = 0.7f,
-                                    targetValue = 1f,
-                                    animationSpec = infiniteRepeatable(
-                                        animation = tween(1000, easing = LinearEasing),
-                                        repeatMode = RepeatMode.Reverse
-                                    )
+                                    initialValue = 0.7f, targetValue = 1f,
+                                    animationSpec = infiniteRepeatable(animation = tween(1000), repeatMode = RepeatMode.Reverse)
                                 )
 
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(CardGray)
-                                        .padding(16.dp),
+                                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(CardGray).padding(16.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column {
-                                        Text(vegetable.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(vegetable.name, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            // Trend Indicator Arrow
+                                            val isHigh = vegetable.mandiPrice > 30.0
+                                            Text(
+                                                text = if (isHigh) "▲" else "▼",
+                                                color = if (isHigh) PriceRed else SoftGreen,
+                                                fontSize = 14.sp
+                                            )
+                                        }
                                         Text("Mandi: ₹${vegetable.mandiPrice}", color = Color.Gray, fontSize = 12.sp)
                                     }
                                     Text(
                                         "₹${"%.1f".format(suggested)}",
-                                        color = SoftGreen.copy(alpha = alpha), // Pulsing effect
+                                        color = SoftGreen.copy(alpha = alpha),
                                         fontSize = 22.sp,
                                         fontWeight = FontWeight.Bold
                                     )
